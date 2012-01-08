@@ -34,14 +34,6 @@
    (map #(Double. %) (rest (str/split (str/replace astr #"\s+" ",") #",")))
 )
 
-;read OPTILIB.txt file with model information
-(defn read-optilib [file]
-  (with-open [reader (java.io.BufferedReader. (java.io.FileReader. file))]
-         (let [no-of-wavelengths (Integer. (str/trim (.readLine reader)))
-          wavelengths (extract-number-list (.readLine reader))]
-        wavelengths)))
-
-
 (defn read-sed-model [reader]
    (let [model-params (make-model-params (extract-number-list (.readLine reader)))
          star-formation-history (make-star-formation-history (extract-number-list (.readLine reader)))
@@ -50,3 +42,10 @@
         ]
       (make-sed-model fprop fprop0 model-params star-formation-history))
 )
+
+(defn ab-magnitudes-from-filter-fluxes [filter-fluxes]
+	(map #(+ (- (* -2.5 (log10 %)) 48.6) (* 5.0 (log10 (* 1.7684e+08 1.e-5)))) filter-fluxes)
+)
+
+
+
