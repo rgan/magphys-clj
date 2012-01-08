@@ -34,3 +34,16 @@
 		(is (float= 91.0 (first result)))
 	)
 )
+
+(deftest test-should-read-sed-model-from-optilib-file
+	(with-open [reader (java.io.BufferedReader. (java.io.FileReader. "optilib.txt"))]
+	    (.readLine reader)  ; consume the first two lines with wavelength info
+	    (.readLine reader)
+		(let [sed-model (read-sed-model reader)]
+			(is (float= 1.14501693E+10 (-> sed-model :model-params :tform)))
+			(is (= 816 (-> sed-model :star-formation-history :nage)))
+			(is (= 6917 (count (-> sed-model :fprop))))
+			(is (= 6917 (count (-> sed-model :fprop0))))
+		)
+	)
+)

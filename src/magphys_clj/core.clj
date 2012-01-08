@@ -1,6 +1,7 @@
 (ns magphys-clj.core
     (:require [clojure.string :as str])
     (:use [incanter.core])
+    (:use [magphys-clj.model])
 )
 
 (defn cosmological_constant [h omega omega_lambda]
@@ -29,9 +30,23 @@
 	(filter #(let [lambda_rest (/ (:lambda_eff %) (+ 1.0 redshift))] (< lambda_rest 10)) filters)
 )
 
+(defn extract-number-list [astr]
+   (map #(Double. %) (rest (str/split (str/replace astr #"\s+" ",") #",")))
+)
+
 ;read OPTILIB.txt file with model information
 (defn read-optilib [file]
   (with-open [reader (java.io.BufferedReader. (java.io.FileReader. file))]
          (let [no-of-wavelengths (Integer. (str/trim (.readLine reader)))
-          wavelengths (map #(Double. %) (rest (str/split (str/replace (.readLine reader) #"\s+" ",") #",")))]
+          wavelengths (extract-number-list (.readLine reader))]
         wavelengths)))
+
+
+(defn read-sed-model [reader]
+   (let [model-params (make-model-params (extract-number-list (.readLine reader)))
+         star-formation-history (make-star-formation-history (extract-number-list (.readLine reader)))
+         fprop (extract-number-list (.readLine reader))
+         fprop0 (extract-number-list (.readLine reader))
+        ]
+      (make-sed-model fprop fprop0 model-params star-formation-history))
+)
