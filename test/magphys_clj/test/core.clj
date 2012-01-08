@@ -27,3 +27,10 @@
 (deftest test-should-not-return-filters-outside-10micron-limit
 	(is (= 0 (count (filters-within-10micron-limit (list (make-filter "SPIRE500" 500 174)) 0.4600))))
 )
+
+(deftest test-should-read-wavelengths-from-optilib-file
+	(let [result (read-optilib "optilib.txt")]
+		(is (= 6917 (count result)))
+		(is (float= 91.0 (first result)))
+	)
+)
